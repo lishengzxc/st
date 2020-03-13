@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>storing</title>
+  <style>
+    body {
+      position: relative;
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    html {
+      background-size: cover;
+      background-position: center;
+    }
+
+    .pan {
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      top: 15vw;
+      width: 80vw;
+      height: 80vw;
+      background-size: 80vw 80vw;
+      margin: 0 auto;
+      background-image: url(./pan.png);
+    }
+
+    .bg {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      filter: blur(10px);
+      background-color: #000;
+      background-position: center;
+    }
+
+    .needle {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 25vw;
+      z-index: 1;
+      transform-origin: 0 0;
+      transform: rotate(-30deg);
+      transition: all .5s;
+    }
+
+    .needle.needlePlay {
+      transform: rotate(0);
+
+    }
+
+    .preivew {
+      width: 50vw;
+      height: 50vw;
+      background-size: cover;
+      background-position: center;
+      border-radius: 50%;
+    }
+
+    .action {
+      position: absolute;
+      width: 20vw;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.8;
+    }
+
+    .panPlay {
+      animation: circle 2s linear infinite;
+    }
+
+    @keyframes circle {
+      0% {
+        transform: rotate(0);
+      }
+
+      100% {
+        transform: rotate(360deg);
+
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <script src="https://g.alicdn.com/code/lib/jquery/3.4.1/jquery.min.js"></script>
+  <div class="bg" id="bg">
+
+
+  </div>
+
+  <img src="./needle.png" class="needle" />
+  <div class="pan">
+    <div id="preivew" class="preivew" />
+
+    <img src="./play-circle.svg" class="action" id="action" data-status="stop" />
+  </div>
+  <audio id="audio" />
+
+  <script>
+    function getQueryVariable(variable) {
+      var query = window.location.search.substring(1);
+      var vars = query.split("&");
+      for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split("=");
+        if (pair[0] == variable) { return pair[1]; }
+      }
+      return (false);
+    }
+
+    var id = getQueryVariable('id') || 'test';
+
+    window.onload = function () {
+      bg.style.backgroundImage = `url(./${id}/bg.jpg)`;
+      preivew.style.backgroundImage = `url(./${id}/bg.jpg)`;
+      audio.src = `./${id}/st.mp3`;
+    }
+
+    action.onclick = playAction;
+
+    function playAction() {
+      const $action = $('#action');
+      const status = $action.attr('data-status');
+
+      ({
+        stop: function () { $action.attr('src', './timeout.svg').attr('data-status', 'play') },
+        play: function () { $action.attr('src', './play-circle.svg').attr('data-status', 'stop') },
+      }[status])();
+
+      ({
+        stop: function () {
+          $('.pan')[0].classList.add('panPlay');
+          $('.needle')[0].classList.add('needlePlay');
+
+          audio.play();
+        },
+        play: function () {
+          $('.pan')[0].classList.remove('panPlay');
+          $('.needle')[0].classList.remove('needlePlay');
+
+          audio.pause();
+        },
+      }[status])();
+    }
+
+  </script>
+</body>
+
+</html>
